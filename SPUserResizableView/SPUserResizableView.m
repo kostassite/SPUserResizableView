@@ -94,7 +94,7 @@ static SPUserResizableViewAnchorPoint SPUserResizableViewLowerMiddleAnchorPoint 
 
 @implementation SPUserResizableView
 
-@synthesize contentView, minWidth, minHeight, preventsPositionOutsideSuperview, delegate;
+@synthesize contentView, minWidth, minHeight, preventsPositionOutsideSuperview, delegate,canBeResized;
 
 - (void)setupDefaultAttributes {
     borderView = [[SPGripViewBorderView alloc] initWithFrame:CGRectInset(self.bounds, kSPUserResizableViewGlobalInset, kSPUserResizableViewGlobalInset)];
@@ -103,6 +103,7 @@ static SPUserResizableViewAnchorPoint SPUserResizableViewLowerMiddleAnchorPoint 
     self.minWidth = kSPUserResizableViewDefaultMinWidth;
     self.minHeight = kSPUserResizableViewDefaultMinHeight;
     self.preventsPositionOutsideSuperview = YES;
+    self.canBeResized=YES;
 }
 
 - (id)initWithFrame:(CGRect)frame {
@@ -218,6 +219,9 @@ typedef struct CGPointSPUserResizableViewAnchorPointPair {
 }
 
 - (void)resizeUsingTouchLocation:(CGPoint)touchPoint {
+    if (!canBeResized) {
+        return;
+    }
     // (1) Update the touch point if we're outside the superview.
     if (self.preventsPositionOutsideSuperview) {
         CGFloat border = kSPUserResizableViewGlobalInset + kSPUserResizableViewInteractiveBorderSize/2;

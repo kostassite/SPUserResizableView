@@ -44,6 +44,8 @@ typedef struct SPUserResizableViewAnchorPoint {
 // Defaults to YES. Disables the user from dragging the view outside the parent view's bounds.
 @property (nonatomic) BOOL preventsPositionOutsideSuperview;
 
+@property (nonatomic) BOOL canBeResized;
+
 - (void)hideEditingHandles;
 - (void)showEditingHandles;
 
