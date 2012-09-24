@@ -46,6 +46,8 @@ typedef struct SPUserResizableViewAnchorPoint {
 
 @property (nonatomic) BOOL canBeResized;
 
+@property (nonatomic) BOOL canBeEdited;
+
 - (void)hideEditingHandles;
 - (void)showEditingHandles;
 

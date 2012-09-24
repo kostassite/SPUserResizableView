@@ -94,7 +94,7 @@ static SPUserResizableViewAnchorPoint SPUserResizableViewLowerMiddleAnchorPoint 
 
 @implementation SPUserResizableView
 
-@synthesize contentView, minWidth, minHeight, preventsPositionOutsideSuperview, delegate,canBeResized;
+@synthesize contentView, minWidth, minHeight, preventsPositionOutsideSuperview, delegate,canBeResized,canBeEdited;
 
 - (void)setupDefaultAttributes {
     borderView = [[SPGripViewBorderView alloc] initWithFrame:CGRectInset(self.bounds, kSPUserResizableViewGlobalInset, kSPUserResizableViewGlobalInset)];
@@ -104,6 +104,7 @@ static SPUserResizableViewAnchorPoint SPUserResizableViewLowerMiddleAnchorPoint 
     self.minHeight = kSPUserResizableViewDefaultMinHeight;
     self.preventsPositionOutsideSuperview = YES;
     self.canBeResized=YES;
+    self.canBeEdited=YES;
 }
 
 - (id)initWithFrame:(CGRect)frame {
@@ -127,8 +128,11 @@ static SPUserResizableViewAnchorPoint SPUserResizableViewLowerMiddleAnchorPoint 
     [self addSubview:contentView];
     
     // Ensure the border view is always on top by removing it and adding it to the end of the subview list.
-    [borderView removeFromSuperview];
-    [self addSubview:borderView];
+    if (self.canBeEdited) {
+        [borderView removeFromSuperview];
+        [self addSubview:borderView];
+    }
+
 }
 
 - (void)setFrame:(CGRect)newFrame {
@@ -179,6 +183,9 @@ typedef struct CGPointSPUserResizableViewAnchorPointPair {
 }
 
 - (void)touchesBegan:(NSSet *)touches withEvent:(UIEvent *)event {
+    if (!self.canBeEdited) {
+        return;
+    }
     // Notify the delegate we've begun our editing session.
     if (self.delegate && [self.delegate respondsToSelector:@selector(userResizableViewDidBeginEditing:)]) {
         [self.delegate userResizableViewDidBeginEditing:self];
@@ -197,6 +204,9 @@ typedef struct CGPointSPUserResizableViewAnchorPointPair {
 }
 
 - (void)touchesEnded:(NSSet *)touches withEvent:(UIEvent *)event {
+    if (!self.canBeEdited) {
+        return;
+    }
     // Notify the delegate we've ended our editing session.
     if (self.delegate && [self.delegate respondsToSelector:@selector(userResizableViewDidEndEditing:)]) {
         [self.delegate userResizableViewDidEndEditing:self];
@@ -204,6 +214,9 @@ typedef struct CGPointSPUserResizableViewAnchorPointPair {
 }
 
 - (void)touchesCancelled:(NSSet *)touches withEvent:(UIEvent *)event {
+    if (!self.canBeEdited) {
+        return;
+    }
     // Notify the delegate we've ended our editing session.
     if (self.delegate && [self.delegate respondsToSelector:@selector(userResizableViewDidEndEditing:)]) {
         [self.delegate userResizableViewDidEndEditing:self];
@@ -211,6 +224,10 @@ typedef struct CGPointSPUserResizableViewAnchorPointPair {
 }
 
 - (void)showEditingHandles {
+    if (!self.canBeEdited) {
+        [borderView setHidden:YES];
+        return;
+    }
     [borderView setHidden:NO];
 }
 
@@ -220,6 +237,9 @@ typedef struct CGPointSPUserResizableViewAnchorPointPair {
 
 - (void)resizeUsingTouchLocation:(CGPoint)touchPoint {
     if (!canBeResized) {
+        return;
+    }
+    if (!self.canBeEdited) {
         return;
     }
     // (1) Update the touch point if we're outside the superview.
@@ -288,6 +308,9 @@ typedef struct CGPointSPUserResizableViewAnchorPointPair {
 }
 
 - (void)translateUsingTouchLocation:(CGPoint)touchPoint {
+    if (!self.canBeEdited) {
+        return;
+    }
     CGPoint newCenter = CGPointMake(self.center.x + touchPoint.x - touchStart.x, self.center.y + touchPoint.y - touchStart.y);
     if (self.preventsPositionOutsideSuperview) {
         // Ensure the translation won't cause the view to move offscreen.
@@ -310,6 +333,9 @@ typedef struct CGPointSPUserResizableViewAnchorPointPair {
 }
 
 - (void)touchesMoved:(NSSet *)touches withEvent:(UIEvent *)event {
+    if (!self.canBeEdited) {
+        return;
+    }
     if ([self isResizing]) {
         [self resizeUsingTouchLocation:[[touches anyObject] locationInView:self.superview]];
     } else {
