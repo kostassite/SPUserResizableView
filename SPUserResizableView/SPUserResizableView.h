@@ -21,7 +21,7 @@ typedef struct SPUserResizableViewAnchorPoint {
 
 @interface SPUserResizableView : UIView {
     SPGripViewBorderView *borderView;
-    UIView *contentView;
+    id inContentView;
     CGPoint touchStart;
     CGFloat minWidth;
     CGFloat minHeight;
@@ -35,7 +35,7 @@ typedef struct SPUserResizableViewAnchorPoint {
 @property (nonatomic, assign) id <SPUserResizableViewDelegate> delegate;
 
 // Will be retained as a subview.
-@property (nonatomic, assign) UIView *contentView;
+@property (nonatomic, assign) id inContentView;
 
 // Default is 48.0 for each.
 @property (nonatomic) CGFloat minWidth;

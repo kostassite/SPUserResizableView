@@ -94,7 +94,7 @@ static SPUserResizableViewAnchorPoint SPUserResizableViewLowerMiddleAnchorPoint 
 
 @implementation SPUserResizableView
 
-@synthesize contentView, minWidth, minHeight, preventsPositionOutsideSuperview, delegate,canBeResized,canBeEdited;
+@synthesize inContentView, minWidth, minHeight, preventsPositionOutsideSuperview, delegate,canBeResized,canBeEdited;
 
 - (void)setupDefaultAttributes {
     borderView = [[SPGripViewBorderView alloc] initWithFrame:CGRectInset(self.bounds, kSPUserResizableViewGlobalInset, kSPUserResizableViewGlobalInset)];
@@ -121,11 +121,11 @@ static SPUserResizableViewAnchorPoint SPUserResizableViewLowerMiddleAnchorPoint 
     return self;
 }
 
-- (void)setContentView:(UIView *)newContentView {
-    [contentView removeFromSuperview];
-    contentView = newContentView;
-    contentView.frame = CGRectInset(self.bounds, kSPUserResizableViewGlobalInset + kSPUserResizableViewInteractiveBorderSize/2, kSPUserResizableViewGlobalInset + kSPUserResizableViewInteractiveBorderSize/2);
-    [self addSubview:contentView];
+- (void)setInContentView:(UIView *)newContentView {
+    [inContentView removeFromSuperview];
+    inContentView = newContentView;
+    [inContentView setFrame: CGRectInset(self.bounds, kSPUserResizableViewGlobalInset + kSPUserResizableViewInteractiveBorderSize/2, kSPUserResizableViewGlobalInset + kSPUserResizableViewInteractiveBorderSize/2)];
+    [self addSubview:inContentView];
     
     // Ensure the border view is always on top by removing it and adding it to the end of the subview list.
     if (self.canBeEdited) {
@@ -137,7 +137,7 @@ static SPUserResizableViewAnchorPoint SPUserResizableViewLowerMiddleAnchorPoint 
 
 - (void)setFrame:(CGRect)newFrame {
     [super setFrame:newFrame];
-    contentView.frame = CGRectInset(self.bounds, kSPUserResizableViewGlobalInset + kSPUserResizableViewInteractiveBorderSize/2, kSPUserResizableViewGlobalInset + kSPUserResizableViewInteractiveBorderSize/2);
+    [inContentView setFrame: CGRectInset(self.bounds, kSPUserResizableViewGlobalInset + kSPUserResizableViewInteractiveBorderSize/2, kSPUserResizableViewGlobalInset + kSPUserResizableViewInteractiveBorderSize/2)];
     borderView.frame = CGRectInset(self.bounds, kSPUserResizableViewGlobalInset, kSPUserResizableViewGlobalInset);
     [borderView setNeedsDisplay];
 }
@@ -344,7 +344,7 @@ typedef struct CGPointSPUserResizableViewAnchorPointPair {
 }
 
 - (void)dealloc {
-    [contentView removeFromSuperview];
+    [inContentView removeFromSuperview];
     [borderView release];
     [super dealloc];
 }
